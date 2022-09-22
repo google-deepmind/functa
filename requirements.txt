@@ -1,0 +1,15 @@
+absl-py
+chex
+dill
+dm-haiku
+imageio
+jax
+jaxlib
+jaxline
+ml_collections
+numpy>=1.23.1
+optax
+tensorflow
+tensorflow-datasets
+typing_extensions
+

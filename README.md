@@ -1,25 +1,161 @@
-# functa
+# Functa
 
-TODO(b/237663778): Add a description for your new project, explain what is
-being released here, etc... Additional, the following sections are normally
-expected for all releases. Feel free to add additional sections if appropriate
-for your project.
+This repository contains code for the ICML 2022 paper
+["From data to functa: Your data point is a function and you can treat it like
+one"](https://arxiv.org/abs/2201.12204) by Emilien Dupont*, Hyunjik Kim*,
+Ali Eslami, Danilo Rezende and Dan Rosenbaum. *Denotes joint first authorship.
 
-## Installation
+The codebase contains the meta-learning experiment for CelebA-HQ-64 and
+SRN CARS, along with a colab that creates a modulation dataset for
+CelebA-HQ-64.
 
-Write instructions for how the user should install your code. The instructions
-should ideally be valid when copy-pasted. You can combine this with the Usage
-section if there's no separate installation step.
+## Setup
 
-## Usage
+To set up a Python virtual environment with the required dependencies, run:
+```shell
+# create virtual environment
+python3 -m venv /tmp/functa_venv
+source /tmp/functa_venv/bin/activate
+# update pip, setuptools and wheel
+pip3 install --upgrade pip setuptools wheel
+# install all required packages
+pip3 install -r requirements.txt
+```
 
-Write example usage of your code. The instructions should ideally be valid when
-copy-pasted, and will be used by your technical reviewer to verify that your
-package functions correctly.
+Note that the directory containing this repository must be included in the
+`PYTHONPATH` environment variable. This can be done by e.g.,
+```shell
+export PYTHONPATH=DIR_CONTAINING_FUNCTA
+```
 
-## Citing this work
+Once done with virtual environment, deactivate with command:
+```shell
+deactivate
+```
+then delete venv with command:
+```shell
+rm -r /tmp/functa_venv
+```
 
-Add citation details here, usually a pastable BibTeX snippet.
+## Setup celeb_a_hq_custom dataset as Tensorflow dataset (TFDS)
+The publicly available celeb_a_hq dataset with TFDS at
+https://www.tensorflow.org/datasets/catalog/celeb_a_hq
+requires manual preparation, for which there are some known issues:
+https://github.com/tensorflow/datasets/issues/1496.
+Alternatively, there exist [zip files](https://drive.google.com/corp/drive/folders/11Vz0fqHS2rXDb5pprgTjpD7S2BAJhi1P)
+that are publicly available for download.
+We convert the 128x128 resolution version into a tensorflow dataset (TFDS)
+so that we can readily load the data into our jax/haiku models with various
+data processing options that come with tfds.
+Note that the resulting dataset has a different ordering to the tfds version,
+hence any train/test split further down the line may be different to the one
+used in our paper, and the downsampling algorithm used may be different.
+We use `tf.image.resize` to resize to 64x64 resolution with the default biliear
+interpolation here.
+
+To set up the tfds, run:
+```shell
+cd celeb_a_hq_custom
+tfds build --register_checksums
+```
+This should be quick to run (few seconds).
+
+## Setup srn_cars dataset as Tensorflow dataset (TFDS) (Optional)
+The publicly available srn_cars dataset exists as a [zip file](https://drive.google.com/corp/drive/folders/1PsT3uKwqHHD2bEEHkIXB99AlIjtmrEiR)
+in the official [PixelNeRF codebase](https://github.com/sxyu/pixel-nerf).
+We convert this into a tensorflow dataset (tfds) so that we can readily load the
+data into our jax/haiku models with various data processing options that come
+with tfds.
+
+To set up the tfds, run:
+```shell
+cd srn_cars
+tfds build --register_checksums
+```
+This can take a while to run (~ 1hr) as we convert views of each scene into an
+array with shape (num_views, H, W, C), so set it running and enjoy some :coffee:
+
+## Run tests (Optional)
+After setting up either dataset, check that you can successfully run a single
+step of the experiment by running the test for celeb_a_hq:
+```shell
+python3 -m test_celeb_a_hq
+```
+or for srn_cars:
+```shell
+python3 -m test_srn_cars
+```
+
+## Run meta-learning experiment
+Set the hyperparameters in `experiment_meta_learning.py` as desired by modifying
+the config values. Then inside the virtual environement, run the
+[JAXline](https://github.com/deepmind/jaxline) experiment via command:
+```shell
+python3 -m experiment_meta_learning
+```
+
+## Download pretrained weights
+Download pretrained weights for the CelebA-HQ-64 meta-learning experiments
+for `mod_dim=64, 128, 256, 512, 1024` and srn_cars with `mod_dim=128` here:
+|Dataset| Modulation Dimension | Link |
+|:---:|:---:|:---:|
+|CelebA-HQ-64| 64 | [.npz](https://storage.googleapis.com/dm-functa/celeba_params_64_latents.npz)|
+|CelebA-HQ-64| 128 | [.npz](https://storage.googleapis.com/dm-functa/celeba_params_128_latents.npz)|
+|CelebA-HQ-64| 256 | [.npz](https://storage.googleapis.com/dm-functa/celeba_params_256_latents.npz)|
+|CelebA-HQ-64| 512 | [.npz](https://storage.googleapis.com/dm-functa/celeba_params_512_latents.npz)|
+|CelebA-HQ-64| 1024 | [.npz](https://storage.googleapis.com/dm-functa/celeba_params_1024_latents.npz)|
+|SRN CARS| 128 | [.npz](https://storage.googleapis.com/dm-functa/srn_cars_params_128_latents.npz)|
+
+Note that the weights for CelebA-HQ-64 were obtained using the original tfds
+dataset, so they can be slightly different to the ones resulting from running
+the above meta-learning experiment with the custom celeb_a_hq dataset.
+
+How to load these weights into the model is shown in the demo Colab below.
+
+## Create or Download modulations for CelebA-HQ-64
+`modulation_dataset_writer.py` creates the modulations on celeba as npz.
+Before running, make sure the pretrained weights for the correct modulation dim
+have been downloaded. Then use `mod_dim` and `pretrained_weights_dir` as input
+args to the python script. Optionally also specify `save_to_dir` to store the
+created modulations as npz in a different directory than the directory
+you are running from. Run via command:
+```shell
+python3 -m modulation_dataset_writer \
+  --mod_dim=64 \
+  --pretrained_weights_dir=DIR_CONTAINING_PRETRAINED_WEIGHTS \
+  --save_to_dir=DIR_TO_SAVE_MODULATION_DATASET
+```
+Alternatively, download the modulations here:
+|Modulation Dimension| Link |
+|:---:|:---:|
+| 64 | [.npz](https://storage.googleapis.com/dm-functa/celeba_modulations_64_latents.npz)|
+| 128 | [.npz](https://storage.googleapis.com/dm-functa/celeba_modulations_128_latents.npz)|
+| 256 | [.npz](https://storage.googleapis.com/dm-functa/celeba_modulations_256_latents.npz)|
+| 512 | [.npz](https://storage.googleapis.com/dm-functa/celeba_modulations_512_latents.npz)|
+| 1024 | [.npz](https://storage.googleapis.com/dm-functa/celeba_modulations_1024_latents.npz)|
+
+Again note that these modulations were obtained using the original tfds
+dataset, so they can be slightly different to the ones resulting from running
+the above script that uses the custom celeb_a_hq dataset.
+
+## Demo Colab [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/deepmind/functa/blob/main/modulation_visualization_colab.ipynb)
+We also include a colab that shows how to visualize modulation reconstructions
+for CelebA-HQ-64.
+
+## Giving Credit
+
+If you use this code in your work, we ask you to please cite our work:
+
+@InProceedings{functa22,
+  title = {From data to functa: Your data point is a function and you can treat it like one},
+  author = {Dupont, Emilien and Kim, Hyunjik and Eslami, S. M. Ali and Rezende, Danilo Jimenez and Rosenbaum, Dan},
+  booktitle = {39th International Conference on Machine Learning (ICML)},
+  year = {2022},
+}
+
+## Raising Issues
+
+Please feel free to raise a GitHub issue.
 
 ## License and disclaimer
 
