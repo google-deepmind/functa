@@ -145,14 +145,14 @@ for CelebA-HQ-64.
 ## Giving Credit
 
 If you use this code in your work, we ask you to please cite our work:
-
+```
 @InProceedings{functa22,
   title = {From data to functa: Your data point is a function and you can treat it like one},
   author = {Dupont, Emilien and Kim, Hyunjik and Eslami, S. M. Ali and Rezende, Danilo Jimenez and Rosenbaum, Dan},
   booktitle = {39th International Conference on Machine Learning (ICML)},
   year = {2022},
 }
-
+```
 ## Raising Issues
 
 Please feel free to raise a GitHub issue.
