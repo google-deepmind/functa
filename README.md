@@ -91,7 +91,7 @@ Set the hyperparameters in `experiment_meta_learning.py` as desired by modifying
 the config values. Then inside the virtual environement, run the
 [JAXline](https://github.com/deepmind/jaxline) experiment via command:
 ```shell
-python3 -m experiment_meta_learning
+python3 -m experiment_meta_learning --config=experiment_meta_learning.py
 ```
 
 ## Download pretrained weights
