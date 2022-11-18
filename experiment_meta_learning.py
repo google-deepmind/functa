@@ -16,8 +16,10 @@
 """Jaxline meta-learning experiment for functa."""
 import sys
 from typing import Generator, List, Mapping, Text, Tuple, Union
+from absl import app
 from absl import flags
 from absl import logging
+import functools
 
 import chex
 import haiku as hk
@@ -130,7 +132,9 @@ def get_config():
   config.log_train_data_interval = 60
   config.log_tensors_interval = 60
   config.save_checkpoint_interval = 60
-  config.eval_specific_checkpoint_dir = ''
+  config.train_checkpoint_all_hosts = False
+  config.checkpoint_dir = '/tmp/training/'
+  config.eval_specific_checkpoint_dir = '/tmp/training/'
 
   return config
 
@@ -689,4 +693,4 @@ class Experiment(experiment.AbstractExperiment):
 
 if __name__ == '__main__':
   flags.mark_flag_as_required('config')
-  platform.main(Experiment, sys.argv[1:])
+  app.run(functools.partial(platform.main, Experiment))
