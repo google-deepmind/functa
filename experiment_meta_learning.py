@@ -94,7 +94,7 @@ def get_config():
   # Empty tuple below corresponds to a linear map. This always gave better PSNR
   # compared to deeper MLPs.
   exp.model.layer_sizes = ()
-  exp.model.latent_init_scale = 0.01
+  exp.model.latent_init_scale = 0.
   # The following attributes are only required if using meta-SGD
   exp.model.use_meta_sgd = True
   exp.model.meta_sgd_init_range = (0.005, 0.1)
