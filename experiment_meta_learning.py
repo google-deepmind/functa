@@ -23,19 +23,19 @@ import functools
 
 import chex
 import haiku as hk
-import jax
-import jax.numpy as jnp
-from jaxline import base_config
-from jaxline import experiment
-from jaxline import platform
-from jaxline import utils
-from ml_collections import config_dict
-import optax
+import jax # Google framework for high-performance numerical computing with automatic differentiation
+import jax.numpy as jnp #own implementation of numpy operations that are optimized for performance 
+from jaxline import base_config # provides a base configuration class that can be used as a starting point for defining experiment configurations.
+from jaxline import experiment # provides a high-level interface for running experiments with JAX. 
+from jaxline import platform # provides utilities for identifying and managing the hardware (GPU/TPU) platform on which the code is running
+from jaxline import utils # provides commonly used utility functions such as data loading, data preprocessing, batching, shuffling, and more.
+from ml_collections import config_dict #provides a collection of utilities for managing structured configuration data.
+import optax # provides a set of optimized gradient-based optimization algorithms (gradient descent, Adam, RMSprop) for ML
 
-from functa import data_utils
-from functa import function_reps
-from functa import helpers
-from functa import minimal_nerf
+from functa import data_utils # used to load the dataset in the _build_train_input method.
+from functa import function_reps #used to define the model and forward function in the _forward_fn method.
+from functa import helpers 
+from functa import minimal_nerf  #used to calculate rays for scenes in the step method.
 from functa import pytree_conversions
 
 FLAGS = flags.FLAGS
