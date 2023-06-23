@@ -15,11 +15,11 @@
 
 """Jaxline meta-learning experiment for functa."""
 import sys
-from typing import Generator, List, Mapping, Text, Tuple, Union
-from absl import app
-from absl import flags
-from absl import logging
-import functools
+from typing import Generator, List, Mapping, Text, Tuple, Union # Generator yields a sequence of values, without returning a final result.
+from absl import app  # Runs the app from command line
+from absl import flags  # Helps input from the command line
+from absl import logging  # Helps write/print logs with metadata
+import functools  # Helps pass partial attributes to methods
 
 import chex
 import haiku as hk
