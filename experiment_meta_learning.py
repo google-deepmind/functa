@@ -15,8 +15,12 @@
 
 """Jaxline meta-learning experiment for functa."""
 import sys
+<<<<<<< HEAD
 # Generator yields a sequence of values, without returning a final result.
 from typing import Generator, List, Mapping, Text, Tuple, Union
+=======
+from typing import Generator, List, Mapping, Text, Tuple, Union # Generator yields a sequence of values, without returning a final result.
+>>>>>>> 9c137b465db99dfbbbccc30ae559d22d92a76e2e
 from absl import app  # Runs the app from command line
 from absl import flags  # Helps input from the command line
 from absl import logging  # Helps write/print logs with metadata
