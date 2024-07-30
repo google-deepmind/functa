@@ -2,7 +2,7 @@ absl-py
 chex
 dill
 dm-haiku
-grpcio==1.49.1
+grpcio==1.53.2
 imageio
 jax
 jaxlib
